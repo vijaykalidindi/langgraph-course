@@ -9,6 +9,10 @@ from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from tavily import TavilyClient
+
+
+tavily = TavilyClient()
 
 
 @tool
@@ -23,7 +27,7 @@ def search_web(query: str) -> str:
     """
 
     print(f"Searching the web for {query}")
-    return "Tokyo weather is sunny."
+    # return "Tokyo weather is sunny."
 
 
 llm = ChatAnthropic(model="claude-sonnet-4-6")
@@ -33,7 +37,8 @@ agent = create_agent(model=llm, tools=tools)
 
 def main():
     print("Hello from langgraph-course!")
-    result = agent.invoke({"messages": [HumanMessage(content="What is the weather in Tokyo?")]})
+    content="What is the weather in Tokyo?"
+    result = agent.invoke({"messages": [HumanMessage(content="Search for 3 jobs postings for an ai engineer using langchain in remote India on linkedin and list their details")]})
     print(result)
 
 if __name__ == "__main__":
