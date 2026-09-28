@@ -1,3 +1,8 @@
+from typing import List
+
+from pydantic import BaseModel, Field
+
+
 from inspect import AGEN_CLOSED
 from dotenv import load_dotenv
 import os
@@ -9,31 +14,24 @@ from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
-from tavily import TavilyClient
+from langchain_tavily import TavilySearch
 
+class Source(BaseModel):
+    """Schema for a source used by the agent"""
 
-tavily = TavilyClient()
+    url: str = Field(description="The url of the source")
 
+class AgentResponse(BaseModel): 
+    """Schema for agent response with answer and sources"""
 
-@tool
-def search_web(query: str) -> str:
-    """
-    Tool that searches the web for the given query.
-    
-    Args:
-        query: The query to search the web for.        
-    Returns:
-        The results of the search.
-    """
-
-    print(f"Searching the web for {query}")
-    # return "Tokyo weather is sunny."
+    answer:str = Field(description="The agent's answer to the query")
+    sources: List[Source] = Field(default_factory=list,description="List of sources used to generate the answer")
 
 
 llm = ChatAnthropic(model="claude-sonnet-4-6")
 # llm = ChatOpenAI()
-tools = [search_web]
-agent = create_agent(model=llm, tools=tools)
+tools = [TavilySearch()]
+agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
 
 def main():
     print("Hello from langgraph-course!")
